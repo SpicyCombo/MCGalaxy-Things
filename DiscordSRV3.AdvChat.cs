@@ -5,15 +5,6 @@ reference Discord.Net.Core.dll
 reference Discord.Net.WebSocket.dll
 reference Discord.Net.Rest.dll
 
-/*
-Notice:
-If you are an operator of eddynetweb network or anyone that has a copy of this file,
-then this license will hereby disgrant you access (including distributions, modifications,
-or anything) to this plugin. Unless if you have the permission granted from SpicyCombo, the 
-original creator of the plugin. If you would like to have access to the current file, then
-please contact me on Discord at SpicyCombo#1665
-*/
-
 // Put your token in on line (line)
 // Configure how you want the status to look on line (line)
 // If you DON'T follow everything said on the setup manual, then it will be your problem.
