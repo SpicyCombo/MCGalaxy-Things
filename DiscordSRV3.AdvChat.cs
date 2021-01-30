@@ -3,6 +3,21 @@ reference System.Net.dll
 reference System.dll
 reference Discord.Net.Core.dll
 reference Discord.Net.WebSocket.dll
+reference Discord.Net.Rest.dll
+
+/*
+Notice:
+If you are an operator of eddynetweb network or anyone that has a copy of this file,
+then this license will hereby disgrant you access (including distributions, modifications,
+or anything) to this plugin. Unless if you have the permission granted from SpicyCombo, the 
+original creator of the plugin. If you would like to have access to the current file, then
+please contact me on Discord at SpicyCombo#1665
+*/
+
+// Put your token in on line (line)
+// Configure how you want the status to look on line (line)
+// If you DON'T follow everything said on the setup manual, then it will be your problem.
+// But, if any error does occur, then please report them to me.
 
 using System;
 using System.Threading.Tasks;
@@ -58,8 +73,6 @@ namespace DiscordSRV3
             _client.MessageReceived += MessageReceivedAsync;
         }
 
-        // was trying to make a custom command for the fake player "Discord" to execute when typing .who, 
-        // but since i am releasing the plugin early, so i will put this on my to do list.
         /*
         public class Cmdnothing2 : Command2
         {
@@ -107,6 +120,7 @@ namespace DiscordSRV3
                     Output(allPlayers[i], p, Server.Config.ListEmptyRanks);
                 }
             }
+            
 
             struct GroupPlayers { public Group group; public StringBuilder builder; }
             static GroupPlayers Make(Player p, CommandData data, Group group, ref int totalPlayers)
@@ -184,7 +198,7 @@ namespace DiscordSRV3
 
         public async Task MainAsync()
         {
-            var token = "get-your-token-from-discord";
+            var token = "gettokenfromdiscord";
 
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
@@ -203,7 +217,7 @@ namespace DiscordSRV3
         {
             ulong[] channelIds =
             {
-                1234567890
+                767133494186082314
             };
 
             // Check if a user posted the message
@@ -262,10 +276,6 @@ namespace DiscordSRV3
             msg = Colors.Escape(msg);
             msg = Colors.StripUsed(msg);
 
-            // the below stuff is here if your server use na2 plugins.
-            // also, if you have custom emotes in your server, then paste
-            // code like: msg = msg.Replace("ingame character", ":discordemote:");
-            // see more on repository wiki
             /*
             msg = msg.Replace("░", ":skull:");
             msg = msg.Replace("▒", ":man_running:");
@@ -329,15 +339,16 @@ namespace DiscordSRV3
             fakeGuest.group = Group.DefaultRank;
             if (filter != null && !filter(fakeGuest, arg)) return;
 
+            // Player name, join and disconnect
             msg = msg.Replace("+ λFULL", ":green_square: + **" + source.FullName + "**").Replace("+ λNICK", ":green_square: - **" + source.ColoredName + "**");
             msg = msg.Replace("- λFULL", ":red_square: - **" + source.FullName + "**").Replace("- λNICK", ":red_square: - **" + source.ColoredName + "**");
             msg = msg.Replace("λFULL:", "**" + source.FullName + ":**").Replace("λNICK:", "**" + source.ColoredName + ":**");
             msg = msg.Replace("λFULL", "**" + source.FullName + "**").Replace("λNICK", "**" + source.ColoredName + "**");
 
+            // Color token removal
             msg = Colors.Escape(msg);
             msg = Colors.StripUsed(msg);
 
-            // already explained in previous comments
             /*
             msg = msg.Replace("░", ":skull:");
             msg = msg.Replace("▒", ":man_running:");
