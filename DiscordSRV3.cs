@@ -3,7 +3,6 @@ reference System.Net.dll
 reference System.dll
 reference Discord.Net.Core.dll
 reference Discord.Net.WebSocket.dll
-reference Discord.Net.Rest.dll
 
 using System;
 using System.Threading.Tasks;
