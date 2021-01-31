@@ -190,7 +190,7 @@ namespace DiscordSRV3
 
         private Task ReadyAsync()
         {
-            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + $"Discord{_client.CurrentUser} is connected!");
+            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + "The discord bot is connected!");
             SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
             return Task.CompletedTask;
         }
@@ -239,8 +239,7 @@ namespace DiscordSRV3
             var final = string.Empty;
 
             var usersEmbedBuilder = new EmbedBuilder()
-.WithDescription($"**There are " + PlayerInfo.NonHiddenCount() + " players online.**" +
-         $"")
+.WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**")
 .WithColor(Color.Gold);
 
             await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
