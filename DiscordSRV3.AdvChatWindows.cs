@@ -77,7 +77,7 @@ namespace DiscordSRV3
 
         public async Task MainAsync()
         {
-            var token = "Nzg3ODA3OTQ2MDU4NDk4MDY4.X9aVUw._KmnpZq1JWVLzxBgc23FYGp4NAU";
+            var token = "discordtoken";
 
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
