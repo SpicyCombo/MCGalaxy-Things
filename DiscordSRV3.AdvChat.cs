@@ -35,6 +35,7 @@ namespace DiscordSRV3
 
         public override void Load(bool startup)
         {
+            SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
             // Command.Register(new Cmdnothing2());
             MainAsync().GetAwaiter().GetResult();
             OnChatEvent.Register(HandleChat, Priority.Low);
@@ -45,6 +46,7 @@ namespace DiscordSRV3
 
         public override void Unload(bool shutdown)
         {
+            SingleSocketMessageToDiscord("**:octagonal_sign: Server has started! / Plugin has been loaded!**");
             // Command.Register(new Cmdnothing2());
             _client.LogoutAsync();
             OnChatEvent.Unregister(HandleChat);
@@ -182,6 +184,13 @@ namespace DiscordSRV3
             ChatMessageFilter scopeFilter = Chat.scopeFilters[(int)scope];
 
             if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
+            {
+                _client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+            }
+        }
+
+        void SingleSocketMessageToDiscord(string socketmessage)
+        {
             {
                 _client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
             }
