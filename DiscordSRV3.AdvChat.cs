@@ -35,7 +35,6 @@ namespace DiscordSRV3
 
         public override void Load(bool startup)
         {
-            SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
             // Command.Register(new Cmdnothing2());
             MainAsync().GetAwaiter().GetResult();
             OnChatEvent.Register(HandleChat, Priority.Low);
@@ -208,6 +207,7 @@ namespace DiscordSRV3
         private Task ReadyAsync()
         {
             Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + $"Discord{_client.CurrentUser} is connected!");
+            SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
             return Task.CompletedTask;
         }
 
