@@ -5,11 +5,6 @@ reference Discord.Net.Core.dll
 reference Discord.Net.WebSocket.dll
 reference Discord.Net.Rest.dll
 
-// Put your token in on line (line)
-// Configure how you want the status to look on line (line)
-// If you DON'T follow everything said on the setup manual, then it will be your problem.
-// But, if any error does occur, then please report them to me.
-
 using System;
 using System.Threading.Tasks;
 using MCGalaxy;
@@ -31,11 +26,10 @@ namespace DiscordSRV3
         public override string MCGalaxy_Version { get { return "1.9.2.8"; } }
         public override string name { get { return "DiscordSRV3.AdvChatSingle"; } }
 
-        public DiscordSocketClient Client { get => _client; set => _client = value; }
+        public DiscordSocketClient Client { get { return _client; } set { _client = value; } }
 
         public override void Load(bool startup)
         {
-            // Command.Register(new Cmdnothing2());
             MainAsync().GetAwaiter().GetResult();
             OnChatEvent.Register(HandleChat, Priority.Low);
             OnChatFromEvent.Register(HandleChatFrom, Priority.Low);
@@ -45,8 +39,7 @@ namespace DiscordSRV3
 
         public override void Unload(bool shutdown)
         {
-            SingleSocketMessageToDiscord("**:octagonal_sign: Server has started! / Plugin has been loaded!**");
-            // Command.Register(new Cmdnothing2());
+            SingleSocketMessageToDiscord("**:octagonal_sign: Server has been shutdown! / Plugin has been unloaded!**");
             _client.LogoutAsync();
             OnChatEvent.Unregister(HandleChat);
             OnChatFromEvent.Unregister(HandleChatFrom);
@@ -65,132 +58,35 @@ namespace DiscordSRV3
             _client.MessageReceived += MessageReceivedAsync;
         }
 
-        /*
-        public class Cmdnothing2 : Command2
-        {
-            public override string name { get { return "nothing2"; } }
-            public override string type { get { return "other"; } }
-            public override LevelPermission defaultRank { get { return LevelPermission.Operator; } }
-            public override void Use(Player p, string message, CommandData data)
-            {
-                int totalPlayers = 0;
-                if (message.Length > 0)
-                {
-                    Group grp = Matcher.FindRanks(p, message);
-                    if (grp == null) return;
-                    GroupPlayers rankPlayers = Make(p, data, grp, ref totalPlayers);
-                    if (totalPlayers == 0)
-                    {
-                        p.Message("There are no players of that rank online.");
-                    }
-                    else
-                    {
-                        Output(rankPlayers, p, false);
-                    }
-                    return;
-                }
-                List<GroupPlayers> allPlayers = new List<GroupPlayers>();
-                foreach (Group grp in Group.GroupList)
-                {
-                    allPlayers.Add(Make(p, data, grp, ref totalPlayers));
-                }
-                if (totalPlayers == 1)
-                {
-                    p.Message("**There is 1 player online.**\n");
-                }
-                else
-                {
-                    p.Message("**There are " + totalPlayers + " players online.**\n");
-                }
-                for (int i = allPlayers.Count - 1; i >= 0; i--)
-                {
-                    Output(allPlayers[i], p, Server.Config.ListEmptyRanks);
-                }
-            }
-            
-            struct GroupPlayers { public Group group; public StringBuilder builder; }
-            static GroupPlayers Make(Player p, CommandData data, Group group, ref int totalPlayers)
-            {
-                GroupPlayers list;
-                list.group = group;
-                list.builder = new StringBuilder();
-                Player[] online = PlayerInfo.Online.Items;
-                foreach (Player pl in online)
-                {
-                    if (pl.group != group || !p.CanSee(pl, data.Rank)) continue;
-                    totalPlayers++;
-                    Append(p, list, pl);
-                }
-                return list;
-            }
-            static void Append(Player target, GroupPlayers list, Player p)
-            {
-                StringBuilder data = list.builder;
-                data.Append(' ');
-                if (p.voice) { data.Append("+").Append(list.group.Color); }
-                data.Append(Colors.StripUsed(target.FormatNick(p)));
-                if (p.hidden) data.Append("*-hidden*");
-                if (p.muted) data.Append("*-muted*");
-                if (p.frozen) data.Append("*-frozen*");
-                if (p.Game.Referee) data.Append("*-ref*");
-                if (p.IsAfk) data.Append("*-afk*");
-                if (p.Unverified) data.Append("*-unverified*");
-                string lvlName = Colors.Strip(p.level.name); // for museums
-                data.Append(" (").Append(lvlName).Append("),");
-            }
-            static string GetPlural(string name)
-            {
-                if (name.Length < 2) return name;
-                string last2 = name.Substring(name.Length - 2).ToLower();
-                if ((last2 != "ed" || name.Length <= 3) && last2[1] != 's')
-                    return name + "s";
-                return name;
-            }
-            static void Output(GroupPlayers list, Player p, bool showWhenEmpty)
-            {
-                StringBuilder data = list.builder;
-                if (data.Length == 0 && !showWhenEmpty) return;
-                if (data.Length > 0) data.Remove(data.Length - 1, 1);
-                string title = "`:" + list.group.Color + GetPlural(list.group.Name) + ":`";
-                p.Message(title + data.ToString());
-            }
-            public override void Help(Player p)
-            {
-                p.Message("%T/nothing2");
-                p.Message("%HDoes nothing.");
-            }
-        }
-        */
-
         void SocketMessageToDiscord(ChatScope scope, string socketmessage, object arg, ChatMessageFilter filter)
         {
             ChatMessageFilter scopeFilter = Chat.scopeFilters[(int)scope];
 
             if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
             {
-                _client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+                _client.GetGuild(581905246008246458).GetTextChannel(787808846356938784).SendMessageAsync(socketmessage);
             }
         }
 
         void SingleSocketMessageToDiscord(string socketmessage)
         {
             {
-                _client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+                _client.GetGuild(581905246008246458).GetTextChannel(787808846356938784).SendMessageAsync(socketmessage);
             }
         }
 
         public async Task MainAsync()
         {
-            var token = "config token here";
+            var token = "Nzg3ODA3OTQ2MDU4NDk4MDY4.X9aVUw._KmnpZq1JWVLzxBgc23FYGp4NAU";
 
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
-            await Client.SetActivityAsync(new Game("with " + PlayerInfo.NonHiddenCount() + " players", ActivityType.Playing)).ConfigureAwait(false);
+            await Client.SetActivityAsync(new Game("with " + PlayerInfo.NonHiddenCount() + " pornstars", ActivityType.Playing)).ConfigureAwait(false);
         }
 
         private Task ReadyAsync()
         {
-            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + "The discord bot is connected!");
+            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + _client.CurrentUser + "is connected!");
             SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
             return Task.CompletedTask;
         }
@@ -201,11 +97,11 @@ namespace DiscordSRV3
         {
             ulong[] channelIds =
             {
-                767133494186082314
+                787808846356938784
             };
 
             // Check if a user posted the message
-            if (!(message is SocketUserMessage msg))
+            if (!(message is SocketUserMessage))
                 return;
 
             var UNick = (message.Author as SocketGuildUser).Nickname;
@@ -231,7 +127,7 @@ namespace DiscordSRV3
             if (message.Content.FirstOrDefault() != '.') return;
 
             var leftover = message.Content.Split(' ').FirstOrDefault();
-            var result = leftover?.ToLower().Replace(".", string.Empty);
+            var result = leftover.ToLower().Replace(".", string.Empty);
 
             if (result != "who") return;
             //write code here vvv
@@ -239,7 +135,8 @@ namespace DiscordSRV3
             var final = string.Empty;
 
             var usersEmbedBuilder = new EmbedBuilder()
-.WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**")
+.WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**" +
+         "")
 .WithColor(Color.Gold);
 
             await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
