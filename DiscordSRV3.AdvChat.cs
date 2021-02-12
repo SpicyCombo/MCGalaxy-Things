@@ -24,6 +24,13 @@ namespace DiscordSRV3
         public override string MCGalaxy_Version { get { return "1.9.2.8"; } }
         public override string name { get { return "DiscordSRV3.AdvChatSingle"; } }
 
+        // Settings - DiscordSRV3
+        // These are the settings that you can modify for the plugin to function differently.
+        string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
+        string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
+        string authorColor = "%2"; // The default color of the Discord user when they are chatting.
+        string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
+
         public override void Load(bool startup)
         {
             MainAsync().GetAwaiter().GetResult();
@@ -35,7 +42,6 @@ namespace DiscordSRV3
 
         public override void Unload(bool shutdown)
         {
-            SingleSocketMessageToDiscord("**:octagonal_sign: Server has started! / Plugin has been loaded!**");
             Client.LogoutAsync();
             OnChatEvent.Unregister(HandleChat);
             OnChatFromEvent.Unregister(HandleChatFrom);
@@ -54,6 +60,7 @@ namespace DiscordSRV3
             Client.MessageReceived += MessageReceivedAsync;
         }
 
+
         void SocketMessageToDiscord(ChatScope scope, string socketmessage, object arg, ChatMessageFilter filter)
         {
             ChatMessageFilter scopeFilter = Chat.scopeFilters[(int)scope];
@@ -64,16 +71,9 @@ namespace DiscordSRV3
             }
         }
 
-        void SingleSocketMessageToDiscord(string socketmessage)
-        {
-            {
-                Client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
-            }
-        }
-
         public async Task MainAsync()
         {
-            var token = "config token here";
+            var token = botToken;
 
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
@@ -82,8 +82,7 @@ namespace DiscordSRV3
 
         private Task ReadyAsync()
         {
-            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + $"{Client.CurrentUser} is connected!");
-            SingleSocketMessageToDiscord("**:white_check_mark: Server has started! / Plugin has been loaded!**");
+            Logger.Log(LogType.SystemActivity, "(Discord) " + Client.CurrentUser + "is connected!");
             return Task.CompletedTask;
         }
 
@@ -100,9 +99,6 @@ namespace DiscordSRV3
                 return;
 
             var UNick = (message.Author as SocketGuildUser).Nickname;
-            var chatColor = "%5";
-            var chatPrefix = "(Discord)";
-            var authorColor = "%e";
 
             if (message.Author.Id == Client.CurrentUser.Id) return;
 
@@ -110,13 +106,13 @@ namespace DiscordSRV3
 
             if (UNick == null)
             {
-                Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + message.Author.Username + ": " + message.Content);
-                Chat.Message(ChatScope.Global, chatColor + chatPrefix + " " + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
+                Logger.Log(LogType.SystemActivity, chatPrefix + message.Author.Username + ": " + message.Content);
+                Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
             }
             else
             {
-                Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + UNick + ": " + message.Content);
-                Chat.Message(ChatScope.Global, chatColor + chatPrefix + " " + authorColor + UNick + ": %f" + message.Content, null, null, true);
+                Logger.Log(LogType.SystemActivity, chatPrefix + UNick + ": " + message.Content);
+                Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + UNick + ": %f" + message.Content, null, null, true);
             }
 
             if (message.Content.FirstOrDefault() != '.') return;
@@ -125,13 +121,9 @@ namespace DiscordSRV3
             var result = leftover?.ToLower().Replace(".", string.Empty);
 
             if (result != "who") return;
-            //write code here vvv
-
-            var final = string.Empty;
 
             var usersEmbedBuilder = new EmbedBuilder()
-.WithDescription($"**There are " + PlayerInfo.NonHiddenCount() + " players online.**" +
-         $"")
+.WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**")
 .WithColor(Color.Gold);
 
             await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
@@ -151,6 +143,7 @@ namespace DiscordSRV3
             msg = Colors.Escape(msg);
             msg = Colors.StripUsed(msg);
             // Start adding emotes after this line.
+            // example for replacing characters: `msg = msg.Replace("ingame character", ":discordemote:");`
 
             SocketMessageToDiscord(scope, msg, arg, filter);
         }
@@ -184,7 +177,7 @@ namespace DiscordSRV3
             }
             catch (Exception ex)
             {
-                Logger.LogError("DiscordSRV3 > Error setting discord relay status", ex);
+                Logger.LogError(chatPrefix + "Error setting discord relay status", ex);
             }
         }
 
@@ -200,7 +193,7 @@ namespace DiscordSRV3
 
         private Task Log(LogMessage msg)
         {
-            Logger.Log(LogType.SystemActivity, "DiscordSRV3 > " + msg.ToString());
+            Logger.Log(LogType.SystemActivity, chatPrefix + msg.ToString());
             return Task.CompletedTask;
         }
     }
