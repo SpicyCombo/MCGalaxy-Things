@@ -68,9 +68,16 @@ namespace DiscordSRV3
         {
             ChatMessageFilter scopeFilter = Chat.scopeFilters[(int)scope];
 
-            if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
+            try {
+                if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
+                {
+                    Client.GetGuild(123456789).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+                }
+            }
+            catch (Exception ex)
             {
-                Client.GetGuild(123456789).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+                Logger.LogError(chatPrefix + "Error sending Discord message: ", ex);
+                HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Error occurred while sending Discord message:" + ex);
             }
         }
 
@@ -85,7 +92,8 @@ namespace DiscordSRV3
 
         private Task ReadyAsync()
         {
-            Logger.Log(LogType.SystemActivity, "(Discord) " + Client.CurrentUser + "is connected!");
+            Logger.Log(LogType.SystemActivity, chatPrefix + Client.CurrentUser + "is connected!");
+            HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Bot user: " + Client.CurrentUser);
             return Task.CompletedTask;
         }
 
@@ -109,13 +117,13 @@ namespace DiscordSRV3
 
             if (UNick == null)
             {
-                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + message.Author.Username + ": " + message.Content);
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + " " + chatPrefix + message.Author.Username + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + message.Author.Username + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
             }
             else
             {
-                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + UNick + ": " + message.Content);
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + " " + chatPrefix + UNick + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + UNick + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + UNick + ": %f" + message.Content, null, null, true);
             }
@@ -182,7 +190,8 @@ namespace DiscordSRV3
             }
             catch (Exception ex)
             {
-                Logger.LogError(chatPrefix + "Error setting discord relay status", ex);
+                Logger.LogError(chatPrefix + "Error setting discord relay status: ", ex);
+                HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Error occurred while configuring remote status:" + ex);
             }
         }
 
