@@ -13,17 +13,16 @@ using MCGalaxy.Events.ServerEvents;
 using Discord.WebSocket;
 using Discord;
 using System.Linq;
-using System.IO;
 
 namespace DiscordSRV3
 {
-    public class DiscordSRV3 : Plugin_Simple
+    public class DiscordChat : Plugin_Simple
     {
         Player fakeGuest = new Player("Discord");
 
         public override string creator { get { return "Jerry Wang & SpicyCombo"; } }
         public override string MCGalaxy_Version { get { return "1.9.2.8"; } }
-        public override string name { get { return "DiscordSRV3.AdvChatSingle"; } }
+        public override string name { get { return "DiscordChat"; } }
 
         // Settings - DiscordSRV3
         // These are the settings that you can modify for the plugin to function differently.
@@ -31,7 +30,8 @@ namespace DiscordSRV3
         string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
         string authorColor = "%2"; // The default color of the Discord user when they are chatting.
         string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
-        string logFile = "logs/dpluginlog.txt";
+        string logPath = "plugins/DiscordPlugin/";
+        
 
         public override void Load(bool startup)
         {
@@ -53,7 +53,7 @@ namespace DiscordSRV3
 
         private DiscordSocketClient Client;
 
-        public DiscordSRV3()
+        public DiscordChat()
         {
             Client = new DiscordSocketClient();
 
@@ -69,7 +69,7 @@ namespace DiscordSRV3
 
             if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
             {
-                Client.GetGuild(1234567890).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
+                Client.GetGuild(123456789).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
             }
         }
 
@@ -190,16 +190,12 @@ namespace DiscordSRV3
 
         void HandleLog(string log)
         {
-            if (!File.Exists(logFile))
-            {
-                File.AppendText(log);
-            }
+            System.IO.FileInfo filedir = new System.IO.FileInfo(logPath + "chat.txt");
+            filedir.Directory.Create();
 
-            else
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(logPath + "chat.txt", true))
             {
-                Logger.Log(LogType.BackgroundActivity, chatPrefix + "Background loggin file does not exist, creating...");
-                File.Create(logFile).Dispose();
-                File.AppendText(log);
+                file.WriteLine(log);
             }
         }
 
