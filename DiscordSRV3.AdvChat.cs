@@ -31,7 +31,7 @@ namespace DiscordSRV3
         string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
         string authorColor = "%2"; // The default color of the Discord user when they are chatting.
         string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
-        string logFile = "text/dpluginlog.txt";
+        string logFile = "logs/dpluginlog.txt";
 
         public override void Load(bool startup)
         {
