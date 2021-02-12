@@ -13,6 +13,7 @@ using MCGalaxy.Events.ServerEvents;
 using Discord.WebSocket;
 using Discord;
 using System.Linq;
+using System.IO;
 
 namespace DiscordSRV3
 {
@@ -30,6 +31,7 @@ namespace DiscordSRV3
         string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
         string authorColor = "%2"; // The default color of the Discord user when they are chatting.
         string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
+        string logFile = "text/dpluginlog.txt";
 
         public override void Load(bool startup)
         {
@@ -186,6 +188,21 @@ namespace DiscordSRV3
             UpdateStatus();
         }
 
+        void HandleLog(string log)
+        {
+            if (!File.Exists(logFile))
+            {
+                File.AppendText(log);
+            }
+
+            else
+            {
+                Logger.Log(LogType.BackgroundActivity, chatPrefix + "Background loggin file does not exist, creating...");
+                File.Create(logFile).Dispose();
+                File.AppendText(log);
+            }
+        }
+
         void HandlePlayerDisconnect(Player p, string reason)
         {
             UpdateStatus();
@@ -193,7 +210,7 @@ namespace DiscordSRV3
 
         private Task Log(LogMessage msg)
         {
-            Logger.Log(LogType.SystemActivity, chatPrefix + msg.ToString());
+            HandleLog(msg.ToString());
             return Task.CompletedTask;
         }
     }
