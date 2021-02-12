@@ -24,6 +24,8 @@ namespace DiscordSRV3
         public override string MCGalaxy_Version { get { return "1.9.2.8"; } }
         public override string name { get { return "DiscordChat"; } }
 
+        DateTime now = DateTime.Now;
+
         // Settings - DiscordSRV3
         // These are the settings that you can modify for the plugin to function differently.
         string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
@@ -31,7 +33,6 @@ namespace DiscordSRV3
         string authorColor = "%2"; // The default color of the Discord user when they are chatting.
         string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
         string logPath = "plugins/DiscordPlugin/";
-        
 
         public override void Load(bool startup)
         {
@@ -108,11 +109,13 @@ namespace DiscordSRV3
 
             if (UNick == null)
             {
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + message.Author.Username + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + message.Author.Username + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
             }
             else
             {
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + UNick + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + UNick + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + UNick + ": %f" + message.Content, null, null, true);
             }
@@ -190,12 +193,12 @@ namespace DiscordSRV3
 
         void HandleLog(string log)
         {
-            System.IO.FileInfo filedir = new System.IO.FileInfo(logPath + "chat.txt");
+            System.IO.FileInfo filedir = new System.IO.FileInfo(logPath + "chat-" + now.Year + "-" + now.Month + "-" + now.Day + ".txt");
             filedir.Directory.Create();
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(logPath + "chat.txt", true))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(logPath + "chat-" + now.Year + "-" + now.Month + "-" + now.Day + ".txt", true))
             {
-                file.WriteLine(log);
+                file.WriteLine(now.Year + "." + now.Month + "." + now.Day + " " + log);
             }
         }
 
