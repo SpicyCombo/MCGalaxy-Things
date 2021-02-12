@@ -95,7 +95,7 @@ namespace DiscordSRV3
                 767133494186082314
             };
 
-            if (!(message is SocketUserMessage msg))
+            if (!(message is SocketUserMessage))
                 return;
 
             var UNick = (message.Author as SocketGuildUser).Nickname;
@@ -118,7 +118,7 @@ namespace DiscordSRV3
             if (message.Content.FirstOrDefault() != '.') return;
 
             var leftover = message.Content.Split(' ').FirstOrDefault();
-            var result = leftover?.ToLower().Replace(".", string.Empty);
+            var result = leftover.ToLower().Replace(".", string.Empty);
 
             if (result != "who") return;
 
