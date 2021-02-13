@@ -13,6 +13,7 @@ using MCGalaxy.Events.ServerEvents;
 using Discord.WebSocket;
 using Discord;
 using System.Linq;
+using System.Net;
 
 namespace DiscordSRV3
 {
@@ -26,16 +27,19 @@ namespace DiscordSRV3
 
         DateTime now = DateTime.Now;
 
-        // Settings - DiscordSRV3
+        // Settings - DiscordChat
         // These are the settings that you can modify for the plugin to function differently.
-        string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
-        string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
-        string authorColor = "%2"; // The default color of the Discord user when they are chatting.
-        string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
-        string logPath = "plugins/DiscordPlugin/";
+        static string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
+        static string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
+        static string authorColor = "%a"; // The default color of the Discord user when they are chatting.
+        static string botToken = "config token here"; // Here you configure your bot's token.
+        static string logPath = "plugins/DiscordPlugin/";
+        // Set your GuildID and ChannelID on line 84
+        // Set the channelID(s) you want the who command to be listened on at line 109
 
         public override void Load(bool startup)
         {
+            ForceEnableTLS();
             MainAsync().GetAwaiter().GetResult();
             OnChatEvent.Register(HandleChat, Priority.Low);
             OnChatFromEvent.Register(HandleChatFrom, Priority.Low);
@@ -52,7 +56,7 @@ namespace DiscordSRV3
             OnPlayerDisconnectEvent.Unregister(HandlePlayerDisconnect);
         }
 
-        private DiscordSocketClient Client;
+        private static DiscordSocketClient Client;
 
         public DiscordChat()
         {
@@ -64,20 +68,20 @@ namespace DiscordSRV3
         }
 
 
-        void SocketMessageToDiscord(ChatScope scope, string socketmessage, object arg, ChatMessageFilter filter)
+        void IngameMessageToDiscord(ChatScope scope, string socketmessage, object arg, ChatMessageFilter filter)
         {
             ChatMessageFilter scopeFilter = Chat.scopeFilters[(int)scope];
 
-            try {
-                if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
-                {
-                    Client.GetGuild(123456789).GetTextChannel(1234567890).SendMessageAsync(socketmessage);
-                }
-            }
-            catch (Exception ex)
+            if (scopeFilter(fakeGuest, arg) && (filter == null || filter(fakeGuest, arg)))
             {
-                Logger.LogError(chatPrefix + "Error sending Discord message: ", ex);
-                HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Error occurred while sending Discord message:" + ex);
+                SocketMessageToDiscord(socketmessage);
+            }
+        }
+
+        static void SocketMessageToDiscord(string socketmessage)
+        {
+            {
+                Client.GetGuild(123456789).GetTextChannel(123456789).SendMessageAsync(socketmessage);
             }
         }
 
@@ -92,8 +96,7 @@ namespace DiscordSRV3
 
         private Task ReadyAsync()
         {
-            Logger.Log(LogType.SystemActivity, chatPrefix + Client.CurrentUser + "is connected!");
-            HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Bot user: " + Client.CurrentUser);
+            Logger.Log(LogType.SystemActivity, "(Discord) " + Client.CurrentUser + " is connected!");
             return Task.CompletedTask;
         }
 
@@ -103,7 +106,7 @@ namespace DiscordSRV3
         {
             ulong[] channelIds =
             {
-                767133494186082314
+                796071862576611398
             };
 
             if (!(message is SocketUserMessage))
@@ -117,13 +120,13 @@ namespace DiscordSRV3
 
             if (UNick == null)
             {
-                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + " " + chatPrefix + message.Author.Username + ": " + message.Content);
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + message.Author.Username + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + message.Author.Username + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
             }
             else
             {
-                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + " " + chatPrefix + UNick + ": " + message.Content);
+                HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + UNick + ": " + message.Content);
                 Logger.Log(LogType.SystemActivity, chatPrefix + UNick + ": " + message.Content);
                 Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + UNick + ": %f" + message.Content, null, null, true);
             }
@@ -158,9 +161,29 @@ namespace DiscordSRV3
             // Start adding emotes after this line.
             // example for replacing characters: `msg = msg.Replace("ingame character", ":discordemote:");`
 
-            SocketMessageToDiscord(scope, msg, arg, filter);
+            IngameMessageToDiscord(scope, msg, arg, filter);
         }
 
+
+        public class CmdDiscordBroadcast : Command2
+        {
+            public override string name { get { return "DiscordBroadcast"; } }
+            public override string type { get { return "other"; } }
+            public override LevelPermission defaultRank { get { return LevelPermission.Operator; } }
+
+            public override void Use(Player p, string message, CommandData data)
+            {
+                string[] args = message.SplitSpaces(2);
+                SocketMessageToDiscord(args[1]);
+                p.Message("%SIngame -> " + prefixColor + chatPrefix + args[1]);
+            }
+
+            public override void Help(Player p)
+            {
+                p.Message("%T/DiscordBroadcast [Message]");
+                p.Message("%SBroadcasts a message to Discord as the bot..");
+            }
+        }
 
         void HandleChat(ChatScope scope, Player source, string msg,
                         object arg, ref ChatMessageFilter filter, bool discord)
@@ -179,9 +202,10 @@ namespace DiscordSRV3
             msg = Colors.StripUsed(msg);
             // Start adding Emotes after this line.
 
-            SocketMessageToDiscord(scope, msg, arg, filter);
+            IngameMessageToDiscord(scope, msg, arg, filter);
         }
 
+        
         void UpdateStatus()
         {
             try
@@ -190,9 +214,15 @@ namespace DiscordSRV3
             }
             catch (Exception ex)
             {
-                Logger.LogError(chatPrefix + "Error setting discord relay status: ", ex);
-                HandleLog(now.Hour + ":" + now.Minute + ":" + now.Second + " " + "Error occurred while configuring remote status:" + ex);
+                Logger.LogError(chatPrefix + "Error setting discord relay status", ex);
             }
+        }
+
+        static void ForceEnableTLS()
+        {
+            // Force enable TLS 1.1/1.2, otherwise checking for updates on Github doesn't work
+            try { ServicePointManager.SecurityProtocol |= (SecurityProtocolType)0x300; } catch { }
+            try { ServicePointManager.SecurityProtocol |= (SecurityProtocolType)0xC00; } catch { }
         }
 
         void HandlePlayerConnect(Player p)
