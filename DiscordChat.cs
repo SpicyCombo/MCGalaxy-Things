@@ -32,13 +32,14 @@ namespace DiscordSRV3
         static string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
         static string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
         static string authorColor = "%a"; // The default color of the Discord user when they are chatting.
-        static string botToken = "config token here"; // Here you configure your bot's token.
+        static string botToken = "oopsie-whoopsie-fucky-wucky"; // Here you configure your bot's token.
         static string logPath = "plugins/DiscordPlugin/";
-        // Set your GuildID and ChannelID on line 84
-        // Set the channelID(s) you want the who command to be listened on at line 109
+        // Set your GuildID and ChannelID on line 86
+        // Set the channelID(s) you want the who command to be listened on at line 111
 
         public override void Load(bool startup)
         {
+            Command.Register(new CmdDiscordBroadcast());
             ForceEnableTLS();
             MainAsync().GetAwaiter().GetResult();
             OnChatEvent.Register(HandleChat, Priority.Low);
@@ -49,6 +50,7 @@ namespace DiscordSRV3
 
         public override void Unload(bool shutdown)
         {
+            Command.Unregister(Command.Find("DiscordBroadcast"));
             Client.LogoutAsync();
             OnChatEvent.Unregister(HandleChat);
             OnChatFromEvent.Unregister(HandleChatFrom);
@@ -174,8 +176,16 @@ namespace DiscordSRV3
             public override void Use(Player p, string message, CommandData data)
             {
                 string[] args = message.SplitSpaces(2);
-                SocketMessageToDiscord(args[1]);
-                p.Message("%SIngame -> " + prefixColor + chatPrefix + args[1]);
+
+                if (message.Length == 0)
+                {
+                    p.Message(prefixColor + chatPrefix + "%STip of the day: try actually typing something."); return;
+                }
+                else
+                {
+                    SocketMessageToDiscord(message);
+                    p.Message("%SIngame -> " + prefixColor + chatPrefix + "%f" + message);
+                }
             }
 
             public override void Help(Player p)
