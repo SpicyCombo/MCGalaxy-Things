@@ -15,7 +15,7 @@ using Discord;
 using System.Linq;
 using System.Net;
 
-namespace DiscordSRV3
+namespace DiscordChat
 {
     public class DiscordChat : Plugin_Simple
     {
