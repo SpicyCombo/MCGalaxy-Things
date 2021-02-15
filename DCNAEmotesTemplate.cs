@@ -1,5 +1,5 @@
             // Copy these if you are too lazy to add each one of the character replacements ;p
-            // NOTICE: Some will not work since they are custom server motes from XMC Discord
+            // NOTICE: Some will not work since they are custom server emotes from XMC Discord
             
             msg = msg.Replace("░", ":skull:");
             msg = msg.Replace("▒", ":man_running:");
