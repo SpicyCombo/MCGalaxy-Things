@@ -25,6 +25,12 @@ namespace DiscordChat
         public override string MCGalaxy_Version { get { return "1.9.2.8"; } }
         public override string name { get { return "DiscordChat"; } }
 
+        /*
+        Hello there! Thank you for using the DiscordChat plugin! Now, before you set this up, please download
+        everything from https://github.com/SpicyCombo/MCGalaxy-Things/tree/main/uploads/Discord.Net and put all 
+        the .dll s at where MCGalaxyCLI.exe or MCGalaxyGUI.exe lives. Need support? Add SpicyCombo#1665 on Discord!
+        */
+        
         DateTime now = DateTime.Now;
 
         // Settings - DiscordChat
@@ -34,8 +40,8 @@ namespace DiscordChat
         static string authorColor = "%a"; // The default color of the Discord user when they are chatting.
         static string botToken = "oopsie-whoopsie-fucky-wucky"; // Here you configure your bot's token.
         static string logPath = "plugins/DiscordPlugin/";
-        // Set your GuildID and ChannelID on line 86
-        // Set the channelID(s) you want the who command to be listened on at line 111
+        // Set your GuildID and ChannelID on line 82
+        // Set the channelID(s) you want the who command to be listened on at line 117
 
         public override void Load(bool startup)
         {
