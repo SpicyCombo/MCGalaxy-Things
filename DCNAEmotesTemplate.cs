@@ -21,7 +21,7 @@
             msg = msg.Replace("┴", ":ghost:");
             msg = msg.Replace("┬", ":star:");
             msg = msg.Replace("├", ":cherry_blossom:");
-            msg = msg.Replace("─", ":cloud_lightning:");
+            msg = msg.Replace("─", ":zap:");
             msg = msg.Replace("┼", ":gun:");
             msg = msg.Replace("╞", ":gun:");
             msg = msg.Replace("╟", ":point_up_2:");
