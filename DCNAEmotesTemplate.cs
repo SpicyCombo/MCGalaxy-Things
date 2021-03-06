@@ -39,7 +39,7 @@
             msg = msg.Replace("╤", ":sweat_drops:");
             msg = msg.Replace("╙", ":wastebasket:");
             msg = msg.Replace("╘", ":fist:");
-            msg = msg.Replace("╒", "<:na2_ex_emote1:803019223450255370>");
+            msg = msg.Replace("╒", ":wheel_of_dharma:");
             msg = msg.Replace("╓", ":ok_hand:");
             msg = msg.Replace("╫", "<:na2_joy:803019282887737385>");
             msg = msg.Replace("╪", ":eye:");
