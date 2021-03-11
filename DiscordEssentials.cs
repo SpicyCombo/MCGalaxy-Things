@@ -4,21 +4,22 @@
 //reference Discord.Net.Core.dll
 //reference Discord.Net.WebSocket.dll
 //reference Discord.Net.Rest.dll
+//reference Newtonsoft.Json2.dll
 
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using MCGalaxy;
 using MCGalaxy.Events.PlayerEvents;
 using MCGalaxy.Events.ServerEvents;
 using Discord.WebSocket;
 using Discord;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using Newtonsoft.Json;
 
 namespace DiscordEssentials
 {
-    public class DiscordEssentials : Plugin_Simple
+    public class DiscordEssentials : Plugin
     {
         Player fakeGuest = new Player("Discord");
 
@@ -34,25 +35,23 @@ namespace DiscordEssentials
 
         DateTime now = DateTime.Now;
 
-        // Settings (General) - DiscordEssentials
-        // These are the general settings that you can modify for the bot's partly behavior
+        // General - These are the general settings that you can modify for the bot's partly behavior
         static string chatPrefix = "(Discord) "; // The prefix that's shown everytime in front of the chat, or in console when the plugin does something.
         static string prefixColor = "%5"; // The color of the prefix when it's shown in-game.
         static string authorColor = "%a"; // The default color of the Discord user when they are chatting.
-        static string botToken = "get-your-token-from-discord"; // Here you configure your bot's token.
+        static string botToken = "get-your-token-from-discord"; // Here you configure your bot's token. Get one at https://discord.com/developers
         static string logPath = "plugins/DiscordPlugin/"; // Path for bot logging
 
-        // Settings (Chat) - DiscordEssentials
-        // These are the settings used for the chatting system.
+        // Chat - These are the settings used for the chatting system.
         static bool chatFeature = true;
         static string chatMode = "advanced"; // Discord chat mode. But sadly, there is currently only the advanced chatmode.
-        static string chatChannelID = "1234567890"; // If the chat feature is enabled, you will have to change 1234567890 to the channel id you want the bot to send messages to.
-        
+        static string chatChannelID = "818654531784933376"; // If the chat feature is enabled, you will have to change 1234567890 to the channel id you want the bot to send messages to.
+        Color EmbedColor = Color.Gold; // This is the color of your embed when you run .who command. Your current choices are:
+        // Blue, DarkBlue, DarkerGrey, DarkGreen, DarkGrey, DarkMagenta, DarkOrange, DarkPurple, DarkRed, DarkReal, Default (Black), Gold, Green, LighterGrey, LightGrey, lightOrange, Magenta, Orange, Purple, Red, Real 
 
-        // Settings (Bug Logger) - DiscordEssentials
-        // Setting to enable if you want enable bug logging.
-        static bool bugFeature = true;
-        static string bugChannelID = "1234567890"; // If the bug report feature is enabled, you will have to change 1234567890 to the channel id you want the bot to send messages to.
+        // Bug Logger - Setting to enable if you want enable bug logging.
+        static bool bugFeature = false;
+        static string bugChannelID = "818277449309749248"; // If the bug report feature is enabled, you will have to change 1234567890 to the channel id you want the bot to send messages to.
 
         public override void Load(bool startup)
         {
@@ -85,7 +84,6 @@ namespace DiscordEssentials
             Client = new DiscordSocketClient();
 
             Client.Log += Log;
-            Client.Ready += ReadyAsync;
             Client.MessageReceived += MessageReceivedAsync;
         }
 
@@ -103,16 +101,16 @@ namespace DiscordEssentials
         static void SocketIngameMessageToDiscord(string socketmessage)
         {
             {
-                ulong convertedChannelID = Convert.ToUInt64(bugChannelID);
+                ulong convertedChannelID = Convert.ToUInt64(chatChannelID);
                 var ClientChannel = Client.GetChannel(convertedChannelID) as IMessageChannel;
                 ClientChannel.SendMessageAsync(socketmessage);
             }
         }
-        
+
         static void SocketBugMessageToDiscord(string socketmessage)
         {
             {
-                ulong convertedChannelID = Convert.ToUInt64(chatChannelID);
+                ulong convertedChannelID = Convert.ToUInt64(bugChannelID);
                 var ClientChannel = Client.GetChannel(convertedChannelID) as IMessageChannel;
                 ClientChannel.SendMessageAsync(socketmessage);
 
@@ -129,7 +127,7 @@ namespace DiscordEssentials
             if (bugFeature == true)
             {
                 if (type != LogType.Error) return;
-                try { SocketBugMessageToDiscord("**An error has occurred on server " + Server.Config.Name + "!!**" + "```\n" + error + "\n```" + "\n<@&807512588261785610> fix the error pls?"); } catch { }
+                try { SocketBugMessageToDiscord("**An error has occurred on server " + Server.Config.Name + "!!**" + "```\n" + error + "\n```" + "\nPlease report this error to UnknownShadow200 for further examination."); } catch { }
             }
         }
 
@@ -143,17 +141,11 @@ namespace DiscordEssentials
             SetActivityStatus();
         }
 
-            private Task ReadyAsync()
-        {
-            Logger.Log(LogType.SystemActivity, "(Discord) " + Client.CurrentUser + " is connected!");
-            return Task.CompletedTask;
-        }
-
         public string Nickname { get; private set; }
 
         private async Task MessageReceivedAsync(SocketMessage message)
         {
-            ulong channelID = Convert.ToUInt64(chatChannelID);
+            ulong[] channelID = { Convert.ToUInt64(chatChannelID) };
 
             if (!(message is SocketUserMessage))
                 return;
@@ -164,19 +156,26 @@ namespace DiscordEssentials
             {
                 if (message.Author.Id == Client.CurrentUser.Id) return;
 
-                if (message.Channel.Id == channelID) return;
+                if (!channelID.Contains(message.Channel.Id)) return;
+
+                string DiscordMessageDisplay = message.Author.Username + ": " + message.Content;
+                var DiscordMessage = message.Content;
+
+                // Request from icanttellyou+, owner of The Build
+                // To replace a character from Discord, simply use the code:
+                // DiscordMessage = DiscordMessage.Replace("discord character", "ingame character")
 
                 if (DiscordUserNickname == null)
                 {
                     HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + message.Author.Username + ": " + message.Content);
-                    Logger.Log(LogType.SystemActivity, chatPrefix + message.Author.Username + ": " + message.Content);
+                    Logger.Log(LogType.SystemActivity, message.Author.Username + ": " + message.Content);
                     Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
                 }
                 else
                 {
                     HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + DiscordUserNickname + ": " + message.Content);
                     Logger.Log(LogType.SystemActivity, chatPrefix + DiscordUserNickname + ": " + message.Content);
-                    Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + DiscordUserNickname + ": %f" + message.Content, null, null, true);
+                    Chat.Message(ChatScope.Global, DiscordUserNickname + ": " + message.Content, null, null, true);
                 }
 
                 if (message.Content.FirstOrDefault() != '.') return;
@@ -185,12 +184,38 @@ namespace DiscordEssentials
                 var result = leftover.ToLower().Replace(".", string.Empty);
 
                 if (result != "who") return;
+                var names = new List<string>();
 
-                var usersEmbedBuilder = new EmbedBuilder()
+                Player[] online = PlayerInfo.Online.Items;
+                foreach (Player pl in online)
+                {
+                    names.Add(pl.DisplayName);
+                }
+
+                var PlayersCount = PlayerInfo.NonHiddenCount();
+                var ConvertedNames = names.Join(", ");
+
+                ConvertedNames = Colors.Escape(ConvertedNames);
+                ConvertedNames = Colors.StripUsed(ConvertedNames);
+
+                if (PlayersCount == 0)
+                {
+                    var usersEmbedBuilder = new EmbedBuilder()
     .WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**")
-    .WithColor(Color.Gold);
+    .WithColor(EmbedColor);
 
-                await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
+                    await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
+                }
+                else
+                {
+
+
+                    var usersEmbedBuilder = new EmbedBuilder()
+.WithDescription("**There are " + PlayerInfo.NonHiddenCount() + " players online.**\n" + "```" + ConvertedNames + "```")
+.WithColor(EmbedColor);
+
+                    await message.Channel.SendMessageAsync(embed: usersEmbedBuilder.Build());
+                }
             }
             else if (chatFeature == false)
             {
@@ -198,15 +223,16 @@ namespace DiscordEssentials
             }
         }
 
-        void HandleCommand(Player p, string cmd, string args, CommandData data) {
+        void HandleCommand(Player p, string cmd, string args, CommandData data)
+        {
             cmd = cmd.ToLower();
             if (!(cmd == "hide" || cmd == "possess" || cmd == "ohide")) return;
 
             SetActivityStatus();
-            }
+        }
 
-            void HandleChatFrom(ChatScope scope, Player source, string msg,
-                            object arg, ref ChatMessageFilter filter, bool discord)
+        void HandleChatFrom(ChatScope scope, Player source, string msg,
+                        object arg, ref ChatMessageFilter filter, bool discord)
         {
             if (chatFeature == true)
             {
@@ -226,7 +252,8 @@ namespace DiscordEssentials
                     // example for replacing characters: `msg = msg.Replace("ingame character", ":discordemote:");`
 
                     IngameMessageToDiscord(scope, msg, arg, filter);
-                } else if (chatMode == "simple")
+                }
+                else if (chatMode == "simple")
                 {
                     // do nothing. let playerdisconnect, playerconnect and playerchat event handlers do the work.
                 }
