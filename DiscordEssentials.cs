@@ -4,7 +4,6 @@
 //reference Discord.Net.Core.dll
 //reference Discord.Net.WebSocket.dll
 //reference Discord.Net.Rest.dll
-//reference Newtonsoft.Json2.dll
 
 using System;
 using System.Net;
