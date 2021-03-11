@@ -4,6 +4,7 @@
 //reference Discord.Net.Core.dll
 //reference Discord.Net.WebSocket.dll
 //reference Discord.Net.Rest.dll
+//reference Newtonsoft.Json2.dll
 
 using System;
 using System.Net;
@@ -150,6 +151,8 @@ namespace DiscordEssentials
                 return;
 
             var DiscordUserNickname = (message.Author as SocketGuildUser).Nickname;
+            var DiscordUsername = message.Author.Username;
+            var DiscordMessage = message.Content;
 
             if (chatFeature == true)
             {
@@ -157,22 +160,23 @@ namespace DiscordEssentials
 
                 if (!channelID.Contains(message.Channel.Id)) return;
 
-                string DiscordMessageDisplay = message.Author.Username + ": " + message.Content;
-                var DiscordMessage = message.Content;
-
                 // Request from icanttellyou+, owner of The Build
                 // To replace a character from Discord, simply use the code:
                 // DiscordMessage = DiscordMessage.Replace("discord character", "ingame character")
+                // To replace a character in a nickname of a user, use
+                // DiscordUsername = DiscordUsername.Replace("discord character", "ingame character")
+                // To replace a character in a nickname of a user, use
+                // DiscordUserNickname = DiscordUserNickname.Replace("discord character", "ingame character")
 
                 if (DiscordUserNickname == null)
                 {
                     HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + message.Author.Username + ": " + message.Content);
-                    Logger.Log(LogType.SystemActivity, message.Author.Username + ": " + message.Content);
-                    Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + message.Content, null, null, true);
+                    Logger.Log(LogType.SystemActivity, DiscordUsername + ": " + message.Content);
+                    Chat.Message(ChatScope.Global, prefixColor + chatPrefix + authorColor + message.Author.Username + ": %f" + DiscordMessage, null, null, true);
                 }
                 else
                 {
-                    HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + DiscordUserNickname + ": " + message.Content);
+                    HandleLog(now.Year + "." + now.Month + "." + now.Day + " " + now.Hour + ":" + now.Minute + ":" + now.Second + chatPrefix + DiscordUserNickname + ": " + DiscordMessage);
                     Logger.Log(LogType.SystemActivity, chatPrefix + DiscordUserNickname + ": " + message.Content);
                     Chat.Message(ChatScope.Global, DiscordUserNickname + ": " + message.Content, null, null, true);
                 }
